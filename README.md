@@ -1,79 +1,67 @@
-# Azure Core Authentication client library for JavaScript
+# Tedious (node implementation of TDS)
+[![Dependency Status](https://david-dm.org/tediousjs/tedious.svg)](https://david-dm.org/tediousjs/tedious) [![NPM version](https://badge.fury.io/js/tedious.svg)](http://badge.fury.io/js/tedious) [![Build Status](https://secure.travis-ci.org/tediousjs/tedious.svg)](http://travis-ci.org/tediousjs/tedious) [![Build Status](https://ci.appveyor.com/api/projects/status/ike3p58hljpyffrl?svg=true)](https://ci.appveyor.com/project/tediousjs/tedious) [![Slack Status](https://tediousjs-slack.herokuapp.com/badge.svg)](https://tediousjs-slack.herokuapp.com/)[![Code Coverage](https://codecov.io/gh/tediousjs/tedious/badge.svg)](https://codecov.io/gh/tediousjs/tedious)
 
-The `@azure/core-auth` package provides core interfaces and helper methods for authenticating with Azure services using Azure Active Directory and other authentication schemes common across the Azure SDK. As a "core" library, it shouldn't need to be added as a dependency to any user code, only other Azure SDK libraries.
 
-## Getting started
+Tedious is a pure-Javascript implementation of the [TDS protocol](http://msdn.microsoft.com/en-us/library/dd304523.aspx),
+which is used to interact with instances of Microsoft's SQL Server. It is intended to be a fairly slim implementation of the protocol, with not too much additional functionality.
 
-### Installation
+**NOTE: New columns are nullable by default as of version 1.11.0**
 
-Install this library using npm as follows
+Previous behavior can be restored using `config.options.enableAnsiNullDefault = false`. See [pull request 230](https://github.com/tediousjs/tedious/pull/230).
 
-```
-npm install @azure/core-auth
-```
+**NOTE: Default login behavior has changed slightly as of version 1.2**
 
-## Key Concepts
+See the [changelog](https://github.com/tediousjs/tedious/releases) for version history.
 
-The `TokenCredential` interface represents a credential capable of providing an authentication token. The `@azure/identity` package contains various credentials that implement the `TokenCredential` interface.
 
-The `AzureKeyCredential` is a static key-based credential that supports key rotation via the `update` method. Use this when a single secret value is needed for authentication, e.g. when using a shared access key.
+### Supported TDS versions
 
-The `AzureNamedKeyCredential` is a static name/key-based credential that supports name and key rotation via the `update` method. Use this when both a secret value and a label are needed, e.g. when using a shared access key and shared access key name.
+- TDS 7.4 (SQL Server 2012/2014/2016/2017/2019/2022)
+- TDS 7.3.B (SQL Server 2008 R2)
+- TDS 7.3.A (SQL Server 2008)
+- TDS 7.2 (SQL Server 2005)
+- TDS 7.1 (SQL Server 2000)
 
-The `AzureSASCredential` is a static signature-based credential that supports updating the signature value via the `update` method. Use this when using a shared access signature.
+## Installation
 
-## Examples
+Node.js is a prerequisite for installing tedious. Once you have installed [Node.js](https://nodejs.org/), installing tedious is simple:
 
-### AzureKeyCredential
+    npm install tedious
 
-```ts snippet:ReadmeSampleAzureKeyCredential
-import { AzureKeyCredential } from "@azure/core-auth";
+## Getting Started
+- [Node.js + macOS](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/mac/)
+- [Node.js + Red Hat Enterprise Linux](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/rhel/)
+- [Node.js + SUSE Linux Enterprise Server](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/sles/)
+- [Node.js + Ubuntu](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/ubuntu/)
+- [Node.js + Windows](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/windows/)
 
-const credential = new AzureKeyCredential("secret value");
+<a name="documentation"></a>
+## Documentation
+More documentation and code samples are available at [tediousjs.github.io/tedious/](http://tediousjs.github.io/tedious/)
 
-console.log(credential.key); // prints: "secret value"
+<a name="name"></a>
+## Name
+_Tedious_ is simply derived from a fast, slightly garbled, pronunciation of the letters T, D and S.
 
-credential.update("other secret value");
+## Developer Survey
 
-console.log(credential.key); // prints: "other secret value"
-```
+We'd like to learn more about how you use tedious:
 
-### AzureNamedKeyCredential
+<a href="https://aka.ms/mssqltedioussurvey"><img style="float: right;"  height="67" width="156" src="https://sqlchoice.blob.core.windows.net/sqlchoice/static/images/survey.png"></a>
 
-```ts snippet:ReadmeSampleAzureNamedCredential
-import { AzureNamedKeyCredential } from "@azure/core-auth";
-
-const credential = new AzureNamedKeyCredential("ManagedPolicy", "secret value");
-
-console.log(`${credential.name}, ${credential.key}`); // prints: "ManagedPolicy, secret value"
-
-credential.update("OtherManagedPolicy", "other secret value");
-
-console.log(`${credential.name}, ${credential.key}`); // prints: "OtherManagedPolicy, other secret value"
-```
-
-### AzureSASCredential
-
-```ts snippet:ReadmeSampleSASCredential
-import { AzureSASCredential } from "@azure/core-auth";
-
-const credential = new AzureSASCredential("signature1");
-
-console.log(credential.signature); // prints: "signature1"
-
-credential.update("signature2");
-
-console.log(credential.signature); // prints: "signature2"
-```
-
-## Next steps
-
-You can build and run the tests locally by executing `npm run test`. Explore the `test` folder to see advanced usage and behavior of the public classes.
-
-## Troubleshooting
-
-If you run into issues while using this library, please feel free to [file an issue](https://github.com/Azure/azure-sdk-for-js/issues/new).
-
+<a name="contributing"></a>
 ## Contributing
+We welcome contributions from the community. Feel free to checkout the code and submit pull requests.
 
-If you'd like to contribute to this library, please read the [contributing guide](https://github.com/Azure/azure-sdk-for-js/blob/main/CONTRIBUTING.md) to learn more about how to build and test the code.
+<a name="license"></a>
+## License
+
+Copyright (c) 2010-2021 Mike D Pilsbury
+
+The MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
