@@ -1,0 +1,19 @@
+2026-11-11T08:16:28.559Z [INFO] ----------------------invoke appmod-install-jdk----------------------
+2026-11-11T08:16:28.567Z [INFO] [Tool.invoke]({name: appmod-install-jdk, modelId: auto, input: {
+  "version": "21",
+  "projectPath": "c:\\OnlineBookstoreDB"
+}}).
+2026-11-11T08:16:28.572Z [INFO] [Tool.invoke] do invoke.
+2026-11-11T08:25:33.793Z [INFO] [Tool.invoke]({result: {
+  "result": {
+    "name": "java",
+    "path": "C:\\Users\\pyliss\\AppData\\Local\\jdks\\jdk-21.0.10\\bin",
+    "version": "21.0.10"
+  },
+  "message": "JDK 21 is installed at C:\\Users\\pyliss\\AppData\\Local\\jdks\\jdk-21.0.10\\bin",
+  "telemetry": {
+    "tool": "JDK",
+    "version": "21"
+  }
+}}).
+2026-11-11T08:25:33.808Z [INFO] ----------------------invoked appmod-install-jdk----------------------

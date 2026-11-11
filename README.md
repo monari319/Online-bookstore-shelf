@@ -1,67 +1,83 @@
-# Tedious (node implementation of TDS)
-[![Dependency Status](https://david-dm.org/tediousjs/tedious.svg)](https://david-dm.org/tediousjs/tedious) [![NPM version](https://badge.fury.io/js/tedious.svg)](http://badge.fury.io/js/tedious) [![Build Status](https://secure.travis-ci.org/tediousjs/tedious.svg)](http://travis-ci.org/tediousjs/tedious) [![Build Status](https://ci.appveyor.com/api/projects/status/ike3p58hljpyffrl?svg=true)](https://ci.appveyor.com/project/tediousjs/tedious) [![Slack Status](https://tediousjs-slack.herokuapp.com/badge.svg)](https://tediousjs-slack.herokuapp.com/)[![Code Coverage](https://codecov.io/gh/tediousjs/tedious/badge.svg)](https://codecov.io/gh/tediousjs/tedious)
+# Azure Abort Controller client library for JavaScript
 
+The `@azure/abort-controller` package provides `AbortSignalLike` interface and
+`AbortError` classes to make it easier to work with the
+[AbortController](https://developer.mozilla.org/docs/Web/API/AbortController)
+and the `AbortSignal` used by
+[fetch](https://developer.mozilla.org/docs/Web/API/Fetch_API) built into modern JavaScript platforms.
 
-Tedious is a pure-Javascript implementation of the [TDS protocol](http://msdn.microsoft.com/en-us/library/dd304523.aspx),
-which is used to interact with instances of Microsoft's SQL Server. It is intended to be a fairly slim implementation of the protocol, with not too much additional functionality.
+Customers of Azure SDK for JavaScript in general do not need to use this library. Instead they
+use `AbortController` and `AbortSignal` provided by their platforms and pass the abort signals to Azure SDK operations.
 
-**NOTE: New columns are nullable by default as of version 1.11.0**
+Key links:
 
-Previous behavior can be restored using `config.options.enableAnsiNullDefault = false`. See [pull request 230](https://github.com/tediousjs/tedious/pull/230).
+- [Source code](https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/core/abort-controller)
+- [Package (npm)](https://www.npmjs.com/package/@azure/abort-controller)
+- [API Reference Documentation](https://learn.microsoft.com/javascript/api/overview/azure/abort-controller-readme)
 
-**NOTE: Default login behavior has changed slightly as of version 1.2**
+## Getting started
 
-See the [changelog](https://github.com/tediousjs/tedious/releases) for version history.
+### Installation
 
+Install this library using npm as follows
 
-### Supported TDS versions
+```
+npm install @azure/abort-controller
+```
 
-- TDS 7.4 (SQL Server 2012/2014/2016/2017/2019/2022)
-- TDS 7.3.B (SQL Server 2008 R2)
-- TDS 7.3.A (SQL Server 2008)
-- TDS 7.2 (SQL Server 2005)
-- TDS 7.1 (SQL Server 2000)
+## Key Concepts
 
-## Installation
+Use `AbortController` to create an `AbortSignal` which can then be passed to Azure SDK operations to cancel
+pending work. The `AbortSignal` can be accessed via the `signal` property on an instantiated `AbortController`.
+An `AbortSignal` can also be returned directly from a static method, e.g. `AbortSignal.timeout(100)`.
+that is cancelled after 100 milliseconds.
 
-Node.js is a prerequisite for installing tedious. Once you have installed [Node.js](https://nodejs.org/), installing tedious is simple:
+## Examples
 
-    npm install tedious
+The below examples assume that `doAsyncWork` is a function that takes a bag of properties, one of which is
+of the abort signal.
 
-## Getting Started
-- [Node.js + macOS](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/mac/)
-- [Node.js + Red Hat Enterprise Linux](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/rhel/)
-- [Node.js + SUSE Linux Enterprise Server](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/sles/)
-- [Node.js + Ubuntu](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/ubuntu/)
-- [Node.js + Windows](https://www.microsoft.com/en-us/sql-server/developer-get-started/node/windows/)
+### Example 1 - basic usage
 
-<a name="documentation"></a>
-## Documentation
-More documentation and code samples are available at [tediousjs.github.io/tedious/](http://tediousjs.github.io/tedious/)
+```ts snippet:ReadmeSampleBasicUsage
+async function doAsyncWork(options: { abortSignal: AbortSignal }): Promise<void> {
+  if (options.abortSignal.aborted) {
+    return;
+  }
 
-<a name="name"></a>
-## Name
-_Tedious_ is simply derived from a fast, slightly garbled, pronunciation of the letters T, D and S.
+  // do async work
+}
 
-## Developer Survey
+const controller = new AbortController();
+doAsyncWork({ abortSignal: controller.signal });
 
-We'd like to learn more about how you use tedious:
+// at some point later
+controller.abort();
+```
 
-<a href="https://aka.ms/mssqltedioussurvey"><img style="float: right;"  height="67" width="156" src="https://sqlchoice.blob.core.windows.net/sqlchoice/static/images/survey.png"></a>
+### Example 2 - Aborting with timeout
 
-<a name="contributing"></a>
+```ts snippet:ReadmeSampleBasicTimeout
+async function doAsyncWork(options: { abortSignal: AbortSignal }): Promise<void> {
+  if (options.abortSignal.aborted) {
+    return;
+  }
+
+  // do async work
+}
+
+const signal = AbortSignal.timeout(1000);
+doAsyncWork({ abortSignal: signal });
+```
+
+## Next steps
+
+You can build and run the tests locally by executing `npm run test`. Explore the `test` folder to see advanced usage and behavior of the public classes.
+
+## Troubleshooting
+
+If you run into issues while using this library, please feel free to [file an issue](https://github.com/Azure/azure-sdk-for-js/issues/new).
+
 ## Contributing
-We welcome contributions from the community. Feel free to checkout the code and submit pull requests.
 
-<a name="license"></a>
-## License
-
-Copyright (c) 2010-2021 Mike D Pilsbury
-
-The MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+If you'd like to contribute to this library, please read the [contributing guide](https://github.com/Azure/azure-sdk-for-js/blob/main/CONTRIBUTING.md) to learn more about how to build and test the code.

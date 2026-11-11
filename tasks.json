@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Sync website-only npm lockfile",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"install",
+				"--package-lock-only",
+				"--ignore-scripts"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

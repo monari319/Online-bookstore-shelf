@@ -228,8 +228,7 @@ async function handleAdminLogin(event) {
                 password: document.getElementById('adminPassword').value
             })
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Unable to sign in.');
+        const result = await readJsonResponse(response, 'Unable to sign in.');
 
         sessionStorage.setItem(adminTokenKey, result.token);
         document.getElementById('adminLoginForm').reset();
@@ -280,11 +279,30 @@ async function adminRequest(url) {
     const response = await fetch(url, {
         headers: { Authorization: `Bearer ${sessionStorage.getItem(adminTokenKey)}` }
     });
-    const result = await response.json();
-    if (!response.ok) {
-        const error = new Error(result.error || 'The request failed.');
+    return readJsonResponse(response);
+}
+
+async function readJsonResponse(response, fallbackMessage = 'The request failed.') {
+    const body = await response.text();
+    let result;
+    try {
+        result = body ? JSON.parse(body) : null;
+    } catch {
+        result = null;
+    }
+
+    if (response.status === 405) {
+        const error = new Error('Live Server does not run the bookstore API. Start the app with "npm start" and open http://localhost:3000 instead.');
         error.status = response.status;
         throw error;
+    }
+    if (!response.ok) {
+        const error = new Error(result?.error || `${fallbackMessage} (HTTP ${response.status}).`);
+        error.status = response.status;
+        throw error;
+    }
+    if (!result || typeof result !== 'object') {
+        throw new Error(`The server returned an empty or invalid response (HTTP ${response.status}).`);
     }
     return result;
 }
@@ -357,8 +375,7 @@ async function handleClientLogin(event) {
                 password: document.getElementById('loginPassword').value
             })
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Unable to sign in.');
+        const result = await readJsonResponse(response, 'Unable to sign in.');
         sessionStorage.setItem(clientTokenKey, result.token);
         sessionStorage.setItem(clientTokenExpiryKey, String(Date.now() + 60 * 60 * 1000));
         scheduleClientLogout();
@@ -375,13 +392,7 @@ async function clientRequest(url) {
     const response = await fetch(url, {
         headers: { Authorization: `Bearer ${sessionStorage.getItem(clientTokenKey)}` }
     });
-    const result = await response.json();
-    if (!response.ok) {
-        const error = new Error(result.error || 'The request failed.');
-        error.status = response.status;
-        throw error;
-    }
-    return result;
+    return readJsonResponse(response);
 }
 
 async function openLibrary() {
