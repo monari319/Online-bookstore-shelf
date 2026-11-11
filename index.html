@@ -1,11 +1,186 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Open Shelf</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover and read a curated collection of free classic novels.">
+    <title>Open Shelf — Free Classic Books</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <p>Start the Open Shelf API on your computer and reconnect the USB debug session.</p>
+    <header class="navbar">
+        <a class="brand" href="#" data-section="browse" aria-label="Open Shelf home">
+            <span class="brand-mark" aria-hidden="true">O</span>
+            <span>open<span class="brand-accent">shelf</span></span>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <button class="nav-btn" data-section="browse">Library</button>
+            <button class="nav-btn active" id="signInNavButton" data-section="auth">Sign in</button>
+            <button class="nav-btn hidden" id="clientLogoutButton" type="button">Sign out</button>
+            <button class="nav-btn admin-link" data-section="admin">Admin</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div id="alertBox" class="alert hidden"></div>
+
+        <section id="browseSection" class="hidden">
+            <div class="hero">
+                <div class="hero-copy">
+                    <p class="eyebrow"><span class="eyebrow-line"></span> A library for curious minds</p>
+                    <h1>Good stories.<br><em>No price tag.</em></h1>
+                    <p class="hero-description">Explore beloved novels, timeless adventures, and unforgettable worlds — free to read, whenever you like.</p>
+                    <a class="hero-cta" href="#library">Explore the library <span aria-hidden="true">↓</span></a>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                    <div class="art-sun"></div>
+                    <div class="art-book art-book-back"></div>
+                    <div class="art-book art-book-front"><span>THE<br>WORLD<br>IS A BOOK</span><i></i></div>
+                    <div class="art-sparkle sparkle-one">✳</div>
+                    <div class="art-sparkle sparkle-two">✳</div>
+                    <div class="art-caption">A little more wonder,<br>one page at a time.</div>
+                </div>
+                <div class="hero-index">EST. FOR READERS <span>✳</span> ALWAYS OPEN</div>
+            </div>
+
+            <div class="library-section" id="library">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">THE OPEN-SHELF COLLECTION</p>
+                        <h2>Find your next <em>favorite.</em></h2>
+                    </div>
+                    <p class="collection-note"><span class="free-dot"></span> Every book is free to read</p>
+                </div>
+
+                <div class="library-toolbar">
+                    <label class="search-box">
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <span class="sr-only">Search books</span>
+                        <input id="bookSearch" type="search" placeholder="Search title, author, or genre" autocomplete="off">
+                        <kbd>Ctrl K</kbd>
+                    </label>
+                    <label class="filter-label" for="genreFilter">Browse by</label>
+                    <select id="genreFilter" aria-label="Filter books by genre">
+                        <option value="all">All stories</option>
+                    </select>
+                </div>
+
+                <div class="collection-meta">
+                    <p id="resultsLabel" aria-live="polite"></p>
+                    <p class="source-note">Free editions hosted by Project Gutenberg · availability may vary by country</p>
+                </div>
+                <div id="bookList" class="book-grid" aria-live="polite"></div>
+                <p id="emptyState" class="empty-state hidden">No books match that search. Try another title or genre.</p>
+            </div>
+
+            <footer class="site-footer">
+                <a class="brand footer-brand" href="#" data-section="browse">
+                    <span class="brand-mark" aria-hidden="true">O</span>
+                    <span>open<span class="brand-accent">shelf</span></span>
+                </a>
+                <p>Made for the love of reading. <span>✳</span> Books open at Project Gutenberg.</p>
+                <a href="https://www.gutenberg.org/" target="_blank" rel="noopener noreferrer">About Project Gutenberg ↗</a>
+            </footer>
+        </section>
+
+        <div id="authShell" class="auth-shell">
+            <section id="authSection" class="card auth-card">
+                <div class="form-intro">
+                    <p class="eyebrow">A FREE LIBRARY FOR EVERY READER</p>
+                    <h1>A reading life,<br><em>all your own.</em></h1>
+                    <p class="subtitle">Sign in or create a free account to explore the library.</p>
+                </div>
+                <div class="tab-buttons" role="tablist" aria-label="Account options">
+                    <button class="tab-btn active" id="loginTab" type="button" role="tab" aria-selected="true" aria-controls="loginForm" data-auth-tab="login">Sign In</button>
+                    <button class="tab-btn" id="registerTab" type="button" role="tab" aria-selected="false" aria-controls="registerForm" data-auth-tab="register">Create Account</button>
+                </div>
+
+                <form id="loginForm" class="auth-form" data-auth-kind="signin" role="tabpanel" aria-labelledby="loginTab">
+                    <h3>Welcome back</h3>
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" autocomplete="username" maxlength="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign in to browse</button>
+                    <button id="showForgotPasswordButton" class="form-link" type="button" aria-expanded="false" aria-controls="forgotPasswordPanel">Forgot password?</button>
+                    <div id="forgotPasswordPanel" class="forgot-password-panel hidden">
+                        <p class="subtitle">Password reset is not configured yet. Contact an administrator for help.</p>
+                        <div class="form-group">
+                            <label for="resetEmail">Email Address</label>
+                            <input type="email" id="resetEmail" autocomplete="email">
+                        </div>
+                        <div class="forgot-password-actions">
+                            <button id="requestPasswordResetButton" type="button" class="btn-reset">Request reset</button>
+                            <button id="cancelPasswordResetButton" type="button" class="form-link">Back to sign in</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form id="registerForm" class="auth-form hidden" data-auth-kind="register" role="tabpanel" aria-labelledby="registerTab">
+                    <h3>Create your account</h3>
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <input type="text" id="regUsername" maxlength="50" autocomplete="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" maxlength="100" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password (at least 6 characters)</label>
+                        <input type="password" id="regPassword" minlength="6" autocomplete="new-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+                <p id="authStatus" class="subtitle" role="status" aria-live="polite"></p>
+            </section>
+        </div>
+
+        <div id="adminShell" class="auth-shell hidden">
+            <section id="adminSection" class="card auth-card">
+                <div id="adminLoginPanel">
+                    <p class="eyebrow">OPEN SHELF ADMINISTRATION</p>
+                    <h2>Administrator sign in</h2>
+                    <p class="subtitle">Sign in with an administrator account to view audit logs.</p>
+                    <form id="adminLoginForm" class="auth-form admin-auth-form" data-auth-kind="admin">
+                        <div class="form-group">
+                            <label for="adminUsername">Username</label>
+                            <input type="text" id="adminUsername" autocomplete="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Password</label>
+                            <input type="password" id="adminPassword" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Sign In</button>
+                    </form>
+                </div>
+
+                <div id="adminLogsPanel" class="hidden">
+                    <div class="admin-heading">
+                        <div>
+                            <h2>System Audit Logs</h2>
+                            <p class="subtitle">Recent entries from the administrator audit view.</p>
+                        </div>
+                        <button id="adminLogoutButton" class="btn-secondary" type="button">Sign Out</button>
+                    </div>
+                    <div id="logStatus" class="subtitle" role="status"></div>
+                    <div class="table-scroll">
+                        <table class="log-table">
+                            <thead id="logTableHead"></thead>
+                            <tbody id="logTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Link External JavaScript (Must be at bottom of body) -->
+    <script src="script.js"></script>
 </body>
 </html>
